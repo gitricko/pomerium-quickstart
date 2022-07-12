@@ -1,0 +1,51 @@
+# See detailed configuration settings : https://www.pomerium.com/docs/reference/
+
+
+# this is the domain the identity provider will callback after a user authenticates
+authenticate_service_url: https://authenticate.pomerium.uncletechno.com
+
+# https://github.com/pomerium/pomerium/issues/2300
+signing_key: LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUFVbVVPSGl5Rlg3M2RpcTJYcHNScThQcjBDMUxqeEo0ZVczLzVxbjMrTjJvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFeVFyQ1dJenhyQk4wNXcvSUFWUVhPb3J4a0xaNGlSWHRpbzFEOEFXelFEcGZnMzdtZXd4eApPNlJCS281OGtaRlRsdUEzYTFVWTBUNFdLSitOY05LdzR3PT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo=
+signing_key_algorithm: ES256
+
+####################################################################################
+# Certificate settings:  https://www.pomerium.com/docs/reference/certificates.html #
+# The example below assumes a certificate and key file will be mounted to a volume #
+# available to the  Docker image.                                                  #
+####################################################################################
+certificate_file: /pomerium/cert.pem
+certificate_key_file: /pomerium/privkey.pem
+
+##################################################################################
+# Identity provider settings : https://www.pomerium.com/docs/identity-providers/ #
+# The keys required in this section vary depending on your IdP. See the          #
+# appropriate docs for your IdP to configure Pomerium accordingly.               #
+##################################################################################
+idp_provider: github
+idp_client_id: ed45xxxd0b1a78
+idp_client_secret: c2c70e1cc31dyyyy1c974d3eab409
+idp_service_account: ewogICAgInVzZXJuYW1lIjogyyyyywX21lRlpXYlhjVlg1MExmTzlOOUdhNEdlN0RTbU1RdTRKZXZuQSIKfQ== 
+# Required by some identity providers for directory sync
+
+# Generate 256 bit random keys  e.g. `head -c32 /dev/urandom | base64`
+cookie_secret: V2JBZk0zWGtsL29UcFUvWjVDWWQ2UHExNXJ0b2VhcDI=
+
+# https://pomerium.com/reference/#routes
+routes:
+  - from: https://verify.pomerium.uncletechno.com
+    to: http://verify:8000
+    policy:
+      - allow:
+          or:
+            - email:
+                is: foodericko@gmail.com
+    pass_identity_headers: true
+
+  - from: https://whoami.pomerium.uncletechno.com
+    to: https://httpbin.org
+    policy:
+      - allow:
+          and:
+            - user:
+                is: gitricko
+    pass_identity_headers: true
